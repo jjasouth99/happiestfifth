@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Ask search engines not to index this page. -->
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+
+  <title>For You ♡</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 349px;
+      max-width: 100%;
+      line-height: 0;
+    }
+
+    .manhwa {
+      display: block;
+      width: 349px;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Small, unobtrusive music control. */
+    #music-control {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      width: 42px;
+      height: 42px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.88);
+      color: #555;
+      font-size: 17px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #music-control.visible {
+      opacity: 0.85;
+      pointer-events: auto;
+    }
+
+    #music-control:active {
+      transform: scale(0.94);
+    }
+
+    @media (max-width: 349px) {
+      .page,
+      .manhwa {
+        width: 100%;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #music-control {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <img
+      class="manhwa"
+      src="manhwa.png"
+      alt="A long illustrated manhwa page"
+      draggable="false"
+    >
+  </main>
+
+  <audio id="music" src="music.mp3" preload="auto" loop></audio>
+
+  <button
+    id="music-control"
+    type="button"
+    aria-label="Mute music"
+    title="Mute music"
+  >♫</button>
+
+  <script>
+    (() => {
+      const music = document.getElementById("music");
+      const control = document.getElementById("music-control");
+
+      let started = false;
+
+      async function startMusic() {
+        if (started) return;
+
+        try {
+          await music.play();
+          started = true;
+
+          // We only need the first scroll to start playback.
+          window.removeEventListener("scroll", startMusic);
+
+          control.classList.add("visible");
+          control.textContent = "♫";
+          control.setAttribute("aria-label", "Mute music");
+          control.setAttribute("title", "Mute music");
+        } catch (error) {
+          // Some browsers may still reject playback. Keep listening so
+          // another user scroll can try again.
+        }
+      }
+
+      window.addEventListener("scroll", startMusic, {
+        passive: true
+      });
+
+      control.addEventListener("click", () => {
+        if (music.paused) {
+          music.play().catch(() => {});
+          control.textContent = "♫";
+          control.setAttribute("aria-label", "Mute music");
+          control.setAttribute("title", "Mute music");
+        } else {
+          music.pause();
+          control.textContent = "🔇";
+          control.setAttribute("aria-label", "Play music");
+          control.setAttribute("title", "Play music");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
